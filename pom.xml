@@ -1,0 +1,42 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>neo-kalvinism</groupId>
+  <artifactId>YelpHelpSupreme</artifactId>
+  <version>0.0.1</version>
+
+  <!-- specify java version needed??? -->
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
+  <!-- overriding src/java directory... -->
+  <build>
+    <sourceDirectory>src/</sourceDirectory>
+  </build>
+
+  <!-- telling it to create a jar -->
+  <packaging>jar</packaging>
+
+
+  <!-- DEPENDENCIES -->
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-client</artifactId>
+      <version>2.7.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>2.11.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-streaming_2.10</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+  </dependencies>
+</project>
+
+

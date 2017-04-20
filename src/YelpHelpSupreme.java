@@ -15,12 +15,12 @@ public class YelpHelpSupreme {
 	
 	public static void main (String[] args) {
 		//Slide 8 HelpSession 11
-		SparkConf sparkConf = new SparkConf().setAppName("cs455-hw3-spark-example");
+		SparkConf sparkConf = new SparkConf().setAppName("YelpHelpSupreme");
 		JavaSparkContext jsc = new JavaSparkContext(sparkConf);
 		Configuration hadoopConfiguration = jsc.hadoopConfiguration();
 
-		//		JavaRDD<String> miniDataset = jsc.textFile("hdfs://");
-		JavaRDD<String> yelpDataset = jsc.textFile("/yelp/yelp_academic_dataset_checkin.json");
+		//hdfs is pointing to kalvin's cluster
+		JavaRDD<String> yelpDataset = jsc.textFile("hdfs://des-moines:42850/project/yelp/yelp_academic_dataset_checkin.json");
 		JavaRDD<String> filterYelp = yelpDataset.filter((String line) -> {
 			String sentence = line;
 			return true;
