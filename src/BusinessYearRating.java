@@ -52,7 +52,7 @@ public class BusinessYearRating {
 //****** Map/Reduce Review**************************************************************************************************************
 		JavaRDD<Row> reviewsRDD = reviews.toJavaRDD();
 		JavaPairRDD<String, Tuple2<Float,Long>> RestaurantPerYearRaw = reviewsRDD.mapToPair((Row row) -> {
-			String key = row.get(2).toString() + "\", \"year\":\"" + row.get(4).toString() + "\",";
+			String key = row.get(2).toString() + "\",\"year\":\"" + row.get(4).toString() + "\",";
 			Float stars = Float.parseFloat(row.get(3).toString());
 			long count = 1;
 			return new Tuple2<>(key, new Tuple2<>(stars,count));
