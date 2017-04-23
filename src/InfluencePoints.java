@@ -93,7 +93,7 @@ public class InfluencePoints {
 			
 			
 			//******Populating dataset for user**************************************************************************************************************
-			Dataset<Row> dsUsers = spark.read().json("hdfs://des-moines.cs.colostate.edu:42850/project/yelp/yelp_academic_dataset_user.json");
+			Dataset<Row> dsUsers = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/yelp_academic_dataset_user.json");
 			Dataset<Row> users = dsUsers.select(col("user_id"),col("elite"));//smaller dataset with user_id and elite years
 			Dataset<Row> notElite = users
 					.select(col("user_id").as("user2"),col("elite").as("elite2"))
@@ -109,7 +109,7 @@ public class InfluencePoints {
 			System.out.println("Elite Users!");
 			
 			//******Populating dataset for review**************************************************************************************************************
-			Dataset<Row> dsReview = spark.read().json("hdfs://des-moines.cs.colostate.edu:42850/project/yelp/yelp_academic_dataset_review.json");
+			Dataset<Row> dsReview = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/yelp_academic_dataset_review.json");
 
 			Dataset<Row> reviews = dsReview
 					.select(col("review_id"), col("user_id").as("usr_rev_id"), col("business_id"),col("stars"), functions.year(col("date")).as("year"))
@@ -124,7 +124,7 @@ public class InfluencePoints {
 					.join(eliteUsers,col("user_id").equalTo(col("usr_rev_id")));
 			eliteReviews.show(10);
 			System.out.println("Elite user reviews! :D >_>");
-			Dataset<Row> restaurantYearRating = spark.read().json("hdfs://des-moines.cs.colostate.edu:42850/project/yelp/RestaurantPerYearRating.json");
+			Dataset<Row> restaurantYearRating = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/RestaurantPerYearRating.json");
 
 
 			// works up to here
@@ -147,10 +147,10 @@ public class InfluencePoints {
 			System.out.println("bar renamed");
 			Dataset<Row> eliteReviewBARename = eliteReviewBeforeAfter
 					.select(col("user_id"), col("business_id"), col("stars"), col("elite_year"), col("beforerating"), col("rating").as("afterrating"))
-					.where(col("afterrating").isNotNull().or(col("beforerating").isNotNull()));
+					.where(col("afterrating").isNotNull().and(col("beforerating").isNotNull()));
 			eliteReviewBARename.show(10);
 			
-			eliteReviewBARename.write().json("EliteReviewBeforeAfter.json");
+//			eliteReviewBARename.write().json("EliteReviewBeforeAfter.json");
 			
 			System.out.println("first join");
 			
@@ -172,7 +172,11 @@ public class InfluencePoints {
 				//beforeRating - rating for the restaurant the year before elite user rating - get(4) 
 				//afterRating - rating for the restaurant the year after elite user rating - get(5)
 				float equalBuffer = (float) 0.2;
-
+				if(row.get(4) == null || row.get(5) == null || row.get(2) == null)
+				{
+					return null;
+				}
+		
 				float before = Float.parseFloat(row.get(4).toString());
 				float after = Float.parseFloat(row.get(5).toString());
 				float rating = Float.parseFloat(row.get(2).toString());
@@ -199,7 +203,8 @@ public class InfluencePoints {
 
 			List<Tuple2<String,Float>> answers = RatingInfluence.collect();
 			for(Tuple2<String,Float> answer : answers){
-				pwriter.println(answer._1 + ", " + answer._2);
+
+				pwriter.println("{\"eliteID\":\"" + answer._1 + "\",\"influence\":\"" + answer._2 + "\"}");
 
 			}
 			pwriter.close();
