@@ -30,19 +30,19 @@ public class AssignEliteAttributes{
 	
 	public static int influenceMapper(double influence)
 	{
-		if(influence < .2)
+		if(influence < .1)
 		{
 			return 0;
 		}
-		else if(influence < .4)
+		else if(influence < .2)
 		{
 			return 1;
 		}
-		else if(influence < .6)
+		else if(influence < .3)
 		{
 			return 2;
 		}
-		else if(influence < .8)
+		else if(influence < .4)
 		{
 			return 3;
 		}
@@ -55,6 +55,11 @@ public class AssignEliteAttributes{
 			System.out.println("Influence input error!");
 			return -1;
 		}
+//		if (influence < .5) {
+//			return 0;
+//		} else {
+//			return 1;
+//		}
 	}
 	public static void main(String[] args) {
 		try {
@@ -131,38 +136,39 @@ public class AssignEliteAttributes{
 				{
 					if(j == 13 || j == 15) //Elite list or Friends list - count number of elements in array.
 					{
-//						List<String> list = row.getList(j);
-//						output += " " + (counter) + ":" + list.size();
-//						counter++;
+						List<String> list = row.getList(j);
+						output += " " + (counter) + ":" + list.size();
+						counter++;
 					}
-					else if(j == 17 || j == 19 || ( (j <= 11) && (j > 0) ) ) //Don't add name or type
+//					else if(j == 17 || j == 19 || ( (j <= 11) && (j > 0) ) ) //Don't add name or type
+					else if(j == 17 || j == 19 ) //Don't add name or type
 					{
 						
 					}
 					else 
 					{
 						double value = Double.parseDouble(row.get(j).toString());
-						if(j == 12 || j == 16 || j == 20 || j == 18)
+						if(j == 12 || j == 16 || j == 20)
 						{
-//							value = value / Double.parseDouble(row.get(18).toString());
-							output += " " + (counter) + ":" + value;
-							counter++;
+							value = value / Double.parseDouble(row.get(18).toString());
+//							output += " " + (counter) + ":" + value;
+//							counter++;
 						}
-//						output += " " + (counter) + ":" + value;
-//						counter++;
+						output += " " + (counter) + ":" + value;
+						counter++;
 					}
 				}
 				
 				//Yelping Since
-				String value = row.get(22).toString();
-				String date = value.substring(0,4);
-				output += " " + counter + ":" + date;
+//				String value = row.get(22).toString();
+//				String date = value.substring(0,4);
+//				output += " " + counter + ":" + date;
 				
 				return new Tuple2<>(key, output);
 			});
 			
 			
-			PrintWriter pwriter = new PrintWriter("quad-EliteAttributes.txt","UTF-8");
+			PrintWriter pwriter = new PrintWriter("scaled-EliteAttributes.txt","UTF-8");
 			List<Tuple2<String,String>> answers = eliteAttributeMap.collect();
 			
 			for(Tuple2<String,String> answer : answers){
