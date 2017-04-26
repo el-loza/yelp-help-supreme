@@ -1,25 +1,13 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
-
 import scala.Tuple2;
-import scala.Tuple3;
-import scala.Tuple5;
-
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.functions;
-import org.apache.spark.storage.StorageLevel;
 
 import static org.apache.spark.sql.functions.col;
 
@@ -27,6 +15,15 @@ public class AssignEliteAttributes{
 
 
 	public static SparkSession spark; 
+	
+	//Break influence into brackets 
+	/*
+	 * 0: 0 =< x < .1 - Not Influential
+	 * 1: .1 =< x < .2 - Barely Influential
+	 * 2: .2 =< x < .3 - Somewhat Influential
+	 * 3: .3 =< x < .4 - Influential
+	 * 4: .4 =< x <= 1 - Highly Influential
+	 */
 	
 	public static int influenceMapper(double influence)
 	{
@@ -55,11 +52,12 @@ public class AssignEliteAttributes{
 			System.out.println("Influence input error!");
 			return -1;
 		}
-//		if (influence < .5) {
-//			return 0;
-//		} else {
-//			return 1;
-//		}
+		//Binary test...
+		//		if (influence < .5) {
+		//			return 0;
+		//		} else {
+		//			return 1;
+		//		}
 	}
 	public static void main(String[] args) {
 		try {
@@ -69,28 +67,27 @@ public class AssignEliteAttributes{
 					.appName("testSpark")
 					.enableHiveSupport()	
 					.getOrCreate();
-			
-			
-			//******Populating dataset for user**************************************************************************************************************
-			Dataset<Row> userList = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/yelp_academic_dataset_user.json");
 
-			Dataset<Row> eliteInfluenceList = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/EliteUserInfluence.json");
+
+			//Populating dataset for user
+			Dataset<Row> userList = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/yelp_academic_dataset_user.json");
+			//Dataset<Row> userList = spark.read().json("hdfs://des-moines.cs.colostate.edu:42850/project/yelp_academic_dataset_user.json");
+
+			//CHANGE CLUSTER/FILE THAT YOU WANT TO READ
+			//Dataset<Row> eliteInfluenceList = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/EliteUserInfluence.json");
+			Dataset<Row> eliteInfluenceList = spark.read().json("hdfs://des-moines.cs.colostate.edu:42850/project/yelp/EliteUserMonthlyInfluence.json");
 
 			System.out.println("join tables");
 			Dataset<Row> eliteAttributes = userList
+					//UNCOMMENT TO RUN AS ELITE USER
 					.join(eliteInfluenceList, col("user_id").equalTo(col("eliteID")),"left_outer")
 					.where(col("eliteID").isNotNull());
+
+					//UNCOMMENT TO RUN AS NORMAL USER
+					//.join(eliteInfluenceList, col("user_id").equalTo(col("normalId")),"left_outer")
+					//.where(col("normalId").isNotNull());
 			eliteAttributes.show(10);
-			
-			//Break influence into brackets 
-			/*
-			 * 1: 0 =< x < .2 - Not Influential
-			 * 2: .2 =< x < .4 - Barely Influential
-			 * 3: .4 =< x < .6 - Somewhat Influential
-			 * 4: .6 =< x < .8 - Influential
-			 * 5: .8 =< x =< 1 - Highly Influential
-			 */
-			
+
 			/*
 			 * 0 average_stars----------yes
 			 * 1 compliment_cool 		yes
@@ -115,16 +112,20 @@ public class AssignEliteAttributes{
 			 * 20 useful----------------yes
 			 * 21 user_id
 			 * 22 yelping_since---------yes
-			 * 23 eliteID
-			 * 24 influence				yes
+			 * 24 eliteID
+			 * 23 influence				yes
 			 *
 			 */
-			
+
 			JavaRDD<Row> eliteAttributeRDD = eliteAttributes.toJavaRDD();
 			JavaPairRDD<String, String> eliteAttributeMap = eliteAttributeRDD.mapToPair((Row row) -> {
 				String key = "";
 				String output = "";
+
+				//UNCOMMENT TO RUN ELITE USER 
 				double influence = Double.parseDouble(row.get(24).toString());
+				//UNCOMMENT TO RUN NORMAL USER
+				//double influence = Double.parseDouble(row.get(23).toString());
 				int influenceScaled = influenceMapper(influence);
 				if(influenceScaled == -1)
 				{
@@ -137,49 +138,54 @@ public class AssignEliteAttributes{
 					if(j == 13 || j == 15) //Elite list or Friends list - count number of elements in array.
 					{
 						List<String> list = row.getList(j);
-						output += " " + (counter) + ":" + list.size();
-						counter++;
+						//UNCOMMENT TO USE ALL ATTRIBUTES -- (19 atts)
+						//output += " " + (counter) + ":" + list.size();
+						//counter++;
 					}
-//					else if(j == 17 || j == 19 || ( (j <= 11) && (j > 0) ) ) //Don't add name or type
+					//else if(j == 17 || j == 19 || ( (j <= 11) && (j > 0) ) ) //Removing compliments to user.
 					else if(j == 17 || j == 19 ) //Don't add name or type
 					{
-						
+
 					}
 					else 
 					{
 						double value = Double.parseDouble(row.get(j).toString());
+						//Small set including Cool, Funny, Useful divided by user's total number of reviews
 						if(j == 12 || j == 16 || j == 20)
 						{
 							value = value / Double.parseDouble(row.get(18).toString());
-//							output += " " + (counter) + ":" + value;
-//							counter++;
+							//UNCOMMENT TO USE ALL ATTRIBUTES
+							output += " " + (counter) + ":" + value;
+							counter++;
 						}
-						output += " " + (counter) + ":" + value;
-						counter++;
+						//UNCOMMENT TO USE ALL ATTRIBUTES -- (19 atts)
+						//output += " " + (counter) + ":" + value;
+						//counter++;
 					}
 				}
-				
+
 				//Yelping Since
-//				String value = row.get(22).toString();
-//				String date = value.substring(0,4);
-//				output += " " + counter + ":" + date;
-				
+				//Determined this attribute provided no benefit in fitting data to the Machine Learning model
+				//				String value = row.get(22).toString();
+				//				String date = value.substring(0,4);
+				//				output += " " + counter + ":" + date;
+
 				return new Tuple2<>(key, output);
 			});
-			
-			
-			PrintWriter pwriter = new PrintWriter("scaled-EliteAttributes.txt","UTF-8");
-			List<Tuple2<String,String>> answers = eliteAttributeMap.collect();
-			
-			for(Tuple2<String,String> answer : answers){
 
+			//CHANGE NAME-- OUTPUT FILE
+			PrintWriter pwriter = new PrintWriter("Elite-MonthlyAttributesQuad.txt","UTF-8");
+			List<Tuple2<String,String>> answers = eliteAttributeMap.collect();
+
+			for(Tuple2<String,String> answer : answers){
+				//Output libsvm formatted file for Machine learning
 				pwriter.println(answer._2);
 
 			}
 
 			pwriter.close();
 
-			
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
