@@ -4,25 +4,14 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
-
 import scala.Tuple2;
-import scala.Tuple3;
-import scala.Tuple5;
-
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
-import org.apache.spark.storage.StorageLevel;
 
 import static org.apache.spark.sql.functions.col;
 
@@ -40,7 +29,7 @@ public class BusinessYearRating {
 				.appName("testSpark")
 				.enableHiveSupport()	
 				.getOrCreate();
-		//******Populating dataset for review**************************************************************************************************************
+		//Populating dataset for review
 		Dataset<Row> dsReview = spark.read().json("hdfs://des-moines.cs.colostate.edu:42850/project/yelp/yelp_academic_dataset_review.json");
 		
 		Dataset<Row> reviews = dsReview
@@ -49,7 +38,7 @@ public class BusinessYearRating {
 		reviews.show(10);
 		System.out.println("All reviews!!!!");
 		
-//****** Map/Reduce Review**************************************************************************************************************
+		//Map/Reduce Review which gets the average reviews for a business on a yearly basis.
 		JavaRDD<Row> reviewsRDD = reviews.toJavaRDD();
 		JavaPairRDD<String, Tuple2<Float,Long>> RestaurantPerYearRaw = reviewsRDD.mapToPair((Row row) -> {
 			String key = row.get(2).toString() + "\",\"year\":\"" + row.get(4).toString() + "\",";
@@ -62,10 +51,10 @@ public class BusinessYearRating {
 		JavaPairRDD<String,Float> RestaurantPerYear = RestaurantPerYearRaw.mapValues((Tuple2<Float,Long> t1) ->
 		(t1._1 / (float) t1._2));
 		
+		//Writes to file in json format.
 		PrintWriter pwriter = new PrintWriter("RestaurantPerYearRating.json","UTF-8");
 		List<Tuple2<String,Float>> answers = RestaurantPerYear.collect();
 		for(Tuple2<String,Float> answer : answers){
-			//pwriter.println(answer._1 + ", " + answer._2);
 			pwriter.println("{\"bid\":\"" + answer._1 + "\"rating\":\"" + answer._2 + "\"}");
 
 		}

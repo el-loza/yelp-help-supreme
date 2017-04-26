@@ -31,7 +31,7 @@ import org.apache.spark.mllib.evaluation.MulticlassMetrics;
 /**
  * An example for Multilayer Perceptron Classification.
  */
-public class testML {
+public class testML2 {
 
 	public static void main(String[] args) {
 
@@ -44,15 +44,15 @@ public class testML {
 
 		PrintWriter pw;
 		try {
-			pw = new PrintWriter("./EliteMonthly-HighHiddenQuad.txt", "UTF-8");
+			pw = new PrintWriter("./TestYearlyNormal.txt", "UTF-8");
 
 
 			// $example on$
 			// Load training data
 			//String path = "hdfs://salem.cs.colostate.edu:42201/yelp/EliteAttributes.txt";
 			//String path = "hdfs://salem.cs.colostate.edu:42201/yelp/quad-EliteAttributes.txt";
-			String path = "hdfs://salem.cs.colostate.edu:42201/yelp/monthly-EliteAttributes.txt";
-			//String path = "hdfs://des-moines.cs.colostate.edu:42850/project/yelp/Elite-MonthlyAttributesQuad.txt";
+			//String path = "hdfs://salem.cs.colostate.edu:42201/yelp/scaled-EliteAttributes.txt";
+			String path = "hdfs://des-moines.cs.colostate.edu:42850/project/yelp/yearly-NormalAttributes.txt";
 			Dataset<Row> dataFrame = spark.read().format("libsvm").load(path);
 
 
@@ -66,21 +66,14 @@ public class testML {
 			// and output of size 3 (classes)
 			//int[] layers = new int[] {20, 5, 2, 4, 5};
 			ArrayList<int[]> diffLayers = new ArrayList();
-			diffLayers.add(new int[] {3, 500, 5});
-			diffLayers.add(new int[] {3, 650, 5});
-			diffLayers.add(new int[] {3, 700, 5});
-			diffLayers.add(new int[] {3, 500, 100, 5});
-			//diffLayers.add(new int[] {19, 750, 5});
-			//diffLayers.add(new int[] {19, 1000, 5});
-			//diffLayers.add(new int[] {19, 1200, 5});
-			//diffLayers.add(new int[] {19, 50, 8});
-			//diffLayers.add(new int[] {19, 100, 8});
-			//diffLayers.add(new int[] {19, 500, 8});
-			//diffLayers.add(new int[] {19, 10, 20, 30, 8});
-			//diffLayers.add(new int[] {19, 30, 30, 30, 8});
-			//diffLayers.add(new int[] {19, 30, 20, 5, 8});
-			//diffLayers.add(new int[] {19, 50, 40, 30, 20, 10, 5, 2, 8});
-			//diffLayers.add(new int[] {19, 20, 20, 20, 20, 20, 20, 20, 20, 8});
+			diffLayers.add(new int[] {19, 50, 5});
+			diffLayers.add(new int[] {19, 100, 5});
+			diffLayers.add(new int[] {19, 500, 5});
+			diffLayers.add(new int[] {19, 10, 20, 30, 5});
+			diffLayers.add(new int[] {19, 30, 30, 30, 5});
+			diffLayers.add(new int[] {19, 30, 20, 5, 5});
+			diffLayers.add(new int[] {19, 50, 40, 30, 20, 10, 5, 2, 5});
+			diffLayers.add(new int[] {19, 20, 20, 20, 20, 20, 20, 20, 20, 5});
 			//diffLayers.add(new int[] {19, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 5});
 			//diffLayers.add(new int[] {19, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 5});
 			//diffLayers.add(new int[] {19, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 5});
@@ -117,7 +110,7 @@ public class testML {
 			}
 
 			//int[] nIterations = {100, 200, 500, 1000, 2000};
-			int[] nIterations = {100};
+			int[] nIterations = {50, 100, 200};
 
 			
 			for (int j = 0; j < nIterations.length; j++){

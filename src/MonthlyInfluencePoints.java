@@ -4,34 +4,21 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
-
 import scala.Tuple2;
-import scala.Tuple3;
-import scala.Tuple5;
-
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
-import org.apache.spark.storage.StorageLevel;
-
 import static org.apache.spark.sql.functions.col;
-
 
 public class MonthlyInfluencePoints {
 
 	public static SparkSession spark; 
 
-
+	//Determine if the elite rating matches the restaurant's next month/year rating
 	public static float getScaling(double elite, double after)
 	{
 		double equalBuffer = 0.2;
@@ -92,13 +79,17 @@ public class MonthlyInfluencePoints {
 					.getOrCreate();
 			
 			
-			//******Populating dataset for user**************************************************************************************************************
+			//Populating dataset for user
 			Dataset<Row> dsUsers = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/yelp_academic_dataset_user.json");
 			Dataset<Row> users = dsUsers.select(col("user_id"),col("elite"));//smaller dataset with user_id and elite years
 			Dataset<Row> notElite = users
 					.select(col("user_id").as("user2"),col("elite").as("elite2"))
 					.where(functions.array_contains(col("elite"), "None"));//dataset with all users that are not elite (used for join)
-
+					
+					//Remove this line if you want to run it on elite users and not normal users.
+					//.limit(47343);//smaller dataset with user_id and elite years
+			
+			//Uncomment this portion if you want to run it for elite users
 			Dataset<Row> eliteUsers = users
 					.select(col("user_id"),col("elite"))
 					.join(notElite,col("user2").equalTo(col("user_id")),"left_outer")
@@ -108,7 +99,8 @@ public class MonthlyInfluencePoints {
 			eliteUsers.show(10);
 			System.out.println("Elite Users!");
 			
-			//******Populating dataset for review**************************************************************************************************************
+			
+			//Populating dataset for review
 			Dataset<Row> dsReview = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/yelp_academic_dataset_review.json");
 
 			Dataset<Row> reviews = dsReview
@@ -122,15 +114,16 @@ public class MonthlyInfluencePoints {
 			Dataset<Row> eliteReviews = reviews
 					.select(col("usr_rev_id"), col("business_id"),col("stars"), col("year"), col("month") )
 					.join(eliteUsers,col("user_id").equalTo(col("usr_rev_id")));
+					
+					//Comment this line and uncomment line above if you want to run on elite users
+					//.join(users,col("user_id").equalTo(col("usr_rev_id")));
+			
 			eliteReviews.show(10);
 			System.out.println("Elite user reviews! :D >_>");
 			Dataset<Row> restaurantYearRating = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/RestaurantPerMonthlyYearRating.json");
-
-
-			// works up to here
 			restaurantYearRating.show(10);
-
 			System.out.println("first join");
+			
 			Dataset<Row> eliteReviewBefore = eliteReviews
 					.join(restaurantYearRating, col("business_id").equalTo(col("bid"))
 							.and(
@@ -159,21 +152,8 @@ public class MonthlyInfluencePoints {
 					.where(col("afterrating").isNotNull().and(col("beforerating").isNotNull()));
 			eliteReviewBARename.show(100);
 			
-//			eliteReviewBARename.write().json("EliteReviewBeforeAfter.json");
-			
-			System.out.println("first join");
-			
-			System.out.println("second join");
 
-			System.out.println("------------------------------all tables created");
-			
-			System.out.println("************************************************************************************************************************");
-			System.out.println("************************************************************************************************************************");
-			System.out.println("reducing finished");
-			System.out.println("************************************************************************************************************************");
-			System.out.println("************************************************************************************************************************");
-
-			//****** Map/Reduce Review**************************************************************************************************************
+			//Map/Reduce Review
 			JavaRDD<Row> eliteReviewsBA = eliteReviewBARename.toJavaRDD();
 			JavaPairRDD<String, Tuple2<Float,Long>> beforeAfter = eliteReviewsBA.mapToPair((Row row) -> {
 				String key = row.get(0).toString();
@@ -194,24 +174,20 @@ public class MonthlyInfluencePoints {
 			}).reduceByKey((Tuple2<Float,Long> t1 , Tuple2<Float,Long> t2)->
 			new Tuple2<>(t1._1 + t2._1, t1._2 + t2._2));
 
-
-			System.out.println();
-			System.out.println();
-			System.out.println("reducing finished");
-			System.out.println();
-			System.out.println();
-
-
 			JavaPairRDD<String,Float> RatingInfluence = beforeAfter.mapValues((Tuple2<Float,Long> t1) ->
 			(t1._1 / (float) t1._2));
 			PrintWriter pwriter = new PrintWriter("EliteUserMonthlyInfluence.json","UTF-8");
-
+			float average = 0;
+			int count = 0;
 			List<Tuple2<String,Float>> answers = RatingInfluence.collect();
 			for(Tuple2<String,Float> answer : answers){
-
+				average = average + answer._2;
+				count++;
 				pwriter.println("{\"eliteID\":\"" + answer._1 + "\",\"influence\":\"" + answer._2 + "\"}");
+				//pwriter.println("{\"normalId\":\"" + answer._1 + "\",\"influence\":\"" + answer._2 + "\"}");
 
 			}
+			System.out.println("Average = " + average/count);
 			pwriter.close();
 
 		} catch (FileNotFoundException e) {
