@@ -78,19 +78,19 @@ Java files:
     - Comment out attributes to limited the attributes used.
     - Infleunce points are put on 5 points scale and distributed evenly to each category. See file for more information of scaling.
   - TestScaledExtreme.java
-    -Simlar to AssignEliteAttributes, gives users 19 attributes but their influence is created based on a higher scale: 0 =     
+    - Simlar to AssignEliteAttributes, gives users 19 attributes but their influence is created based on a higher scale: 0 =     
     <.025, 1 = < .05, 2 = <.075... A deeper scale to map users to a different influence scale. Attempted this to help machine 
     learning models map to different categories.
   - TestScaledExtremeScaledAtts.java
-    -Similar to AssignEliteAttributes, but all attributes are divided by the number of reviews a user has made, depending on the 
+    - Similar to AssignEliteAttributes, but all attributes are divided by the number of reviews a user has made, depending on the 
     number returned by the att/numreviews, we create a new scale for the attribute, giving a number between 0-20 as the 
     attribute. This was an attempt that if the attributes are scaled between similar numbers that Machine Learning trend can be 
     developed, the more scales the easier it is ascertain the category a user falls in.
   - TestScaledScale.java
-    -Similar to AssignEliteAttributes, but all attributes are divided by the number of reviews a user has made. Difference from 
+    - Similar to AssignEliteAttributes, but all attributes are divided by the number of reviews a user has made. Difference from 
     TestScaledExtremeScaledAtts.java -> The value att/numReviews were not scaled. 
   - TestScaledScaledAtts.java
-    -Similar to AssignEliteAttributes, but all attributes are divided by the number of reviews a user has made. The value is that 
+    - Similar to AssignEliteAttributes, but all attributes are divided by the number of reviews a user has made. The value is that 
     put on a scale that would return 0 -9. Difference from TestScaledExtremeScaledAtts.java -> The scale placed is smaller. 
     Thought behind it was to put attributes on a scale for machine learning to easily create a trend.
   - MLearning.java
@@ -100,6 +100,6 @@ Java files:
     -
     -
   - testML.java
-    -Runs a loop on the two models that we ran our data through. The ArrayList diffLayers were changed on different hidden layers, high and low, more or less layers. Int[] nIterations added more iterations, from what we've seen, they all converge to one similar output after x iterations. Inputs a .txt written in libsvm format from hdfs cluster of data that you wish to run through machine learning model. Outputs a .txt file specified
+    - Runs a loop on the two models that we ran our data through. The ArrayList diffLayers were changed on different hidden layers, high and low, more or less layers. Int[] nIterations added more iterations, from what we've seen, they all converge to one similar output after x iterations. Inputs a .txt written in libsvm format from hdfs cluster of data that you wish to run through machine learning model. Outputs a .txt file specified
   - testML2.java
-    -TestML2 is similar to testML. The information for diffLayers and int[] nIterations were changed and specifed for the test that we wanted to run on x.txt file and output as y.txt file
+    - TestML2 is similar to testML. The information for diffLayers and int[] nIterations were changed and specifed for the test that we wanted to run on x.txt file and output as y.txt file
