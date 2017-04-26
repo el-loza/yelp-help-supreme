@@ -50,8 +50,8 @@ Command to execute classes:
 Order to run: 
   - BusinessMonthlyRating.java or BusinessYearRating.java
   - InfluencePoint.java or MonthlyInfluencePoints.java or NormalInfluencePoints.java
-  - AssignEliteAtrributes.java
-  - MLearning.java, MLExtremeScale.java, TestScaledExtreme.java, TestScaledExtremeScaledAtts.java, TestScaledScale.java, TestScaledScaledAtts.java, testML.java, or testML2.java
+  - AssignEliteAtrributes.java, TestScaledExtreme.java, TestScaledExtremeScaledAtts.java, or TestScaledScale.java, TestScaledScaledAtts.java
+  - MLearning.java, MLExtremeScale.java, testML.java, or testML2.java
   Note: File paths and certain comments may need to be changed to run different Machine learning analytics
     
 Java files:
@@ -72,10 +72,6 @@ Java files:
     -
   - AssignEliteAtrributes.java
     -
-  - MLearning.java
-    -
-  - MLExtremeScale.java
-    -
   - TestScaledExtreme.java
     -
   - TestScaledExtremeScaledAtts.java
@@ -83,6 +79,11 @@ Java files:
   - TestScaledScale.java
     -
   - TestScaledScaledAtts.java
+    -
+  - MLearning.java
+    -
+  - MLExtremeScale.java
+    -
     -
   - testML.java
     -
