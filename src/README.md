@@ -1,5 +1,5 @@
 # yelp-help-supreme
-
+Authors: Kalvin Lenh, Ethan Loza, David Sahud, Jeffrey Huynh
 Assumption:
   - You atleast have spark setup and can run our hdfs, otherwise have your own hdfs up as well
 
