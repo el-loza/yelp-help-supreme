@@ -65,11 +65,14 @@ Java files:
     - Each Buisness_id is concated with an monthYear integer for each month year combination.
     - This will produce a file RestaurantPerMonthlyYearRating.json that contains the Monthly rating for each Restaurant.
   - InfluencePoint.java
-    -
+    - Calcuates Average InfluencePoints for each elite user with yearly Business rating data.
+    - An Influence Point can range from 0 to 1. This defines how a elite user review rating effects future rating for that restaurnt.
   - MonthlyInfluencePoints.java
-    -
+    - Calcuates Average Infleunce Points for each elite user or normal user with monthly Business rating data..
+    - A normal user is a user that has never been given the elite status.
   - NormalInfluencePoints.java
-    -
+    - Calcuates Average InfluencePoints for each normal user with yearly Business rating data.
+    - A normal user is a user that has never been given the elite status
   - AssignEliteAtrributes.java
     -
   - TestScaledExtreme.java
