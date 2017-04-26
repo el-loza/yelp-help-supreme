@@ -74,7 +74,9 @@ Java files:
     - Calcuates Average InfluencePoints for each normal user with yearly Business rating data.
     - A normal user is a user that has never been given the elite status
   - AssignEliteAtrributes.java
-    -
+    - For each user (Elite or Normal) pulled from a json file it gets the attriubtes for that user and outputs it into a libsvm formatted file for Machine learning
+    - Comment out attributes to limited the attributes used. 
+    - Infleunce points are put on 5 points scale and distributed evenly to each category. See file for more information of scaling.
   - TestScaledExtreme.java
     -
   - TestScaledExtremeScaledAtts.java
@@ -84,7 +86,8 @@ Java files:
   - TestScaledScaledAtts.java
     -
   - MLearning.java
-    -
+    - Sample format for Multilayer Perceptron Classification Machine Learning tests.
+    - Select training data, and determines test set accuracy for the given model.
   - MLExtremeScale.java
     -
     -
