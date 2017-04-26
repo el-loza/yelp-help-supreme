@@ -11,40 +11,32 @@ import org.apache.spark.sql.SparkSession;
 
 import static org.apache.spark.sql.functions.col;
 
-public class TestScaledExtreme{
+public class AssignEliteAttributesRegression{
+
 
 	public static SparkSession spark; 
 	
 	public static int influenceMapper(double influence)
 	{
-		if(influence < .025)
+		if(influence < .1)
 		{
 			return 0;
 		}
-		else if(influence < .05){
-			return 1;
-		}
-		else if(influence < .075){
-			return 2;
-		}
-		else if(influence < .1){
-			return 3;
-		}
 		else if(influence < .2)
 		{
-			return 4;
+			return 1;
 		}
 		else if(influence < .3)
 		{
-			return 5;
+			return 2;
 		}
 		else if(influence < .4)
 		{
-			return 6;
+			return 3;
 		}
 		else if(influence <= 1)
 		{
-			return 7;
+			return 4;
 		}
 		else
 		{
@@ -70,14 +62,12 @@ public class TestScaledExtreme{
 			//******Populating dataset for user**************************************************************************************************************
 			Dataset<Row> userList = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/yelp_academic_dataset_user.json");
 
-			Dataset<Row> eliteInfluenceList = spark.read().json("hdfs://des-moines.cs.colostate.edu:42850/project/yelp/NormalUserYearlyInfluence.json");
+			Dataset<Row> eliteInfluenceList = spark.read().json("hdfs://salem.cs.colostate.edu:42201/yelp/EliteUserMonthlyInfluence.json");
 
 			System.out.println("join tables");
 			Dataset<Row> eliteAttributes = userList
-					//.join(eliteInfluenceList, col("user_id").equalTo(col("eliteID")),"left_outer")
-					//.where(col("eliteID").isNotNull());
-					.join(eliteInfluenceList, col("user_id").equalTo(col("normalId")),"left_outer")
-					.where(col("normalId").isNotNull());
+					.join(eliteInfluenceList, col("user_id").equalTo(col("eliteID")),"left_outer")
+					.where(col("eliteID").isNotNull());
 			eliteAttributes.show(10);
 			
 			//Break influence into brackets 
@@ -122,18 +112,12 @@ public class TestScaledExtreme{
 			JavaPairRDD<String, String> eliteAttributeMap = eliteAttributeRDD.mapToPair((Row row) -> {
 				String key = "";
 				String output = "";
-				
-				//double influence = Double.parseDouble(row.get(24).toString());
-				
-				//Running on normal users
-				double influence = Double.parseDouble(row.get(23).toString());
-				
-				int influenceScaled = influenceMapper(influence);
-				if(influenceScaled == -1)
+				double influence = Double.parseDouble(row.get(24).toString());
+				if(influence == -1)
 				{
 					return null;
 				}
-				output += influenceScaled;
+				output += influence;
 				int counter = 1;
 				for(int j = 0; j < 21; j++)
 				{
@@ -171,7 +155,7 @@ public class TestScaledExtreme{
 			});
 			
 			
-			PrintWriter pwriter = new PrintWriter("scaledextreme-NormalYearlyAttributes.txt","UTF-8");
+			PrintWriter pwriter = new PrintWriter("EliteAttributesRawInfluence.txt","UTF-8");
 			List<Tuple2<String,String>> answers = eliteAttributeMap.collect();
 			
 			for(Tuple2<String,String> answer : answers){

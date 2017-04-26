@@ -28,7 +28,7 @@ import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
 /**
  * An example for Multilayer Perceptron Classification and One V Rest.
  * Sample format for the Machine Learning tests
- * Note: Our data has run on multiple tests shown but not fully included in: "testML.java", "testML2.java", "TestScaledExtreme.java" 
+ * Note: Our data has run on multiple tests shown but not fully included in: "testML.java", "testML2.java"
  * Path (different test file data), hidden layer iterations, and max iterations have been altered for each test.
  */
 public class MLearning {

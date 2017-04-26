@@ -153,7 +153,7 @@ public class MonthlyInfluencePoints {
 			eliteReviewBARename.show(100);
 			
 
-			//Map/Reduce Review
+			//Map/Reduce Key:User_ID, Map: Determine an influence score for each user review, reducer gets the average influence score for a user.
 			JavaRDD<Row> eliteReviewsBA = eliteReviewBARename.toJavaRDD();
 			JavaPairRDD<String, Tuple2<Float,Long>> beforeAfter = eliteReviewsBA.mapToPair((Row row) -> {
 				String key = row.get(0).toString();
