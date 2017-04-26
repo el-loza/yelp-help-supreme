@@ -96,9 +96,6 @@ Java files:
   - MLearning.java
     - Sample format for Multilayer Perceptron Classification Machine Learning tests.
     - Select training data, and determines test set accuracy for the given model.
-  - MLExtremeScale.java
-    -
-    -
   - testML.java
     - Runs a loop on the two models that we ran our data through. The ArrayList diffLayers were changed on different hidden layers, high and low, more or less layers. Int[] nIterations added more iterations, from what we've seen, they all converge to one similar output after x iterations. Inputs a .txt written in libsvm format from hdfs cluster of data that you wish to run through machine learning model. Outputs a .txt file specified
   - testML2.java
