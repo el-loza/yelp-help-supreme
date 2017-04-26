@@ -65,13 +65,18 @@ Java files:
     - Each Buisness_id is concated with an monthYear integer for each month year combination.
     - This will produce a file RestaurantPerMonthlyYearRating.json that contains the Monthly rating for each Restaurant.
   - InfluencePoint.java
-    -
+    - Calcuates Average InfluencePoints for each elite user with yearly Business rating data.
+    - An Influence Point can range from 0 to 1. This defines how a elite user review rating effects future rating for that restaurnt.
   - MonthlyInfluencePoints.java
-    -
+    - Calcuates Average Infleunce Points for each elite user or normal user with monthly Business rating data..
+    - A normal user is a user that has never been given the elite status.
   - NormalInfluencePoints.java
-    -
+    - Calcuates Average InfluencePoints for each normal user with yearly Business rating data.
+    - A normal user is a user that has never been given the elite status
   - AssignEliteAtrributes.java
-    -
+    - For each user (Elite or Normal) pulled from a json file it gets the attriubtes for that user and outputs it into a libsvm formatted file for Machine learning
+    - Comment out attributes to limited the attributes used.
+    - Infleunce points are put on 5 points scale and distributed evenly to each category. See file for more information of scaling.
   - TestScaledExtreme.java
     -Simlar to AssignEliteAttributes, gives users 19 attributes but their influence is created based on a higher scale: 0 =     
     <.025, 1 = < .05, 2 = <.075... A deeper scale to map users to a different influence scale. Attempted this to help machine 
@@ -89,7 +94,8 @@ Java files:
     put on a scale that would return 0 -9. Difference from TestScaledExtremeScaledAtts.java -> The scale placed is smaller. 
     Thought behind it was to put attributes on a scale for machine learning to easily create a trend.
   - MLearning.java
-    -
+    - Sample format for Multilayer Perceptron Classification Machine Learning tests.
+    - Select training data, and determines test set accuracy for the given model.
   - MLExtremeScale.java
     -
     -
